@@ -1,0 +1,22 @@
+{
+  "name": "netris",
+  "version": "0.0.0",
+  "authors": [
+    "Noah Freitas <noah.j.freitas@gmail.com>"
+  ],
+  "description": "Tetris for the web.",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "es6-shim": "~0.21.1"
+  }
+}

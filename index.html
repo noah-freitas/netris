@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Netris</title>
+        <script src="bower_components/es6-shim/es6-shim.min.js"></script>
+        <style>
+            body {
+                margin  : 0;
+                padding : 0;
+            }
+            netris-board {
+                background : rgba(255, 0, 0, 0.3);
+                display    : block;
+                height     : 400px;
+                outline    : 1px solid red;
+                position   : relative;
+                width      : 400px;
+                z-index    : 1;
+            }
+            netris-block {
+                background : black;
+                display    : block;
+                height     : 50px;
+                left       : 0;
+                position   : absolute;
+                top        : 0;
+                width      : 50px;
+                z-index    : 10;
+            }
+        </style>
+    </head>
+    <body>
+        <netris-board data-block-size="50">
+            <netris-block data-pos-left="200" data-pos-top="0" data-fall-rate="5" data-player="Noah"></netris-block>
+        </netris-board>
+        <netris-controller data-left-key="left" data-down-key="down" data-right-key="right" data-player="Noah"></netris-controller>
+        <script src="src/netris-block.js"></script>
+        <script src="src/netris-board.js"></script>
+        <script src="src/netris-controller.js"></script>
+    </body>
+</html>
