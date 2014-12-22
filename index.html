@@ -19,22 +19,29 @@
                 z-index    : 1;
             }
             netris-block {
-                background : black;
                 display    : block;
-                height     : 50px;
+                height     : 20px;
                 left       : 0;
                 position   : absolute;
                 top        : 0;
-                width      : 50px;
+                width      : 20px;
                 z-index    : 10;
+            }
+            netris-block[data-player="Noah"] {
+                background : red;
+            }
+            netris-block[data-player="Imelda"] {
+                background : blue;
             }
         </style>
     </head>
     <body>
-        <netris-board data-block-size="50">
-            <netris-block data-pos-left="200" data-pos-top="0" data-fall-rate="5" data-player="Noah"></netris-block>
+        <netris-board data-block-size="20">
+            <netris-block data-pos-left="200" data-pos-top="0" data-fall-rate="1" data-player="Noah"></netris-block>
+            <netris-block data-pos-left="100" data-pos-top="0" data-fall-rate="1" data-player="Imelda"></netris-block>
         </netris-board>
         <netris-controller data-left-key="left" data-down-key="down" data-right-key="right" data-player="Noah"></netris-controller>
+        <netris-controller data-left-key="u+0041" data-down-key="u+0053" data-right-key="u+0044" data-player="Imelda"></netris-controller>
         <script src="src/netris-block.js"></script>
         <script src="src/netris-board.js"></script>
         <script src="src/netris-controller.js"></script>

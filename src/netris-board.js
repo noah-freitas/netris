@@ -16,6 +16,8 @@
     function createdCallback() {
         this.blockStopped = blockStopped.bind(this);
         this.endGame      = endGame.bind(this);
+        this.fallBlocks   = fallBlocks.bind(this);
+        this.gameOver     = false;
         this.makeRows     = makeRows.bind(this);
     }
 
@@ -23,13 +25,14 @@
     function attachedCallback() {
         this.addEventListener('netris-block:stopped'     , this.blockStopped);
         this.addEventListener('netris-block:outofbounds' , this.endGame);
+        requestAnimationFrame(this.fallBlocks);
     }
 
     // addBlock :: @netris-board, netris-block -> undefined
     function addBlock(oldBlock) {
         var newBlock              = document.createElement('netris-block');
         newBlock.dataset.posTop   = -this.dataset.blockSize;
-        newBlock.dataset.posLeft  = parseInt(oldBlock.style.left, 10);
+        newBlock.dataset.posLeft  = oldBlock.dataset.posLeft;
         newBlock.dataset.fallRate = oldBlock.dataset.fallRate;
         newBlock.dataset.player   = oldBlock.dataset.player;
         this.appendChild(newBlock);
@@ -67,8 +70,18 @@
 
     // endGame :: Event -> undefined
     function endGame(e) {
+        this.gameOver = true;
         console.log('Game ended by: ', e.target);
         alert('Game over!');
+    }
+
+    // fallBlocks :: @netris-board, unefined -> undefined
+    function fallBlocks() {
+        Array.from(this.querySelectorAll('netris-block[data-falling="true"]'))
+             .sort(function (b1, b2) { return b2.offsetTop - b1.offsetTop; })
+             .forEach(function (b) { b.fall(); });
+
+        if (!this.gameOver) requestAnimationFrame(this.fallBlocks);
     }
 
     // getRows :: @netris-board, undefined -> [[netris-block || null]]
