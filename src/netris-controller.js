@@ -7,14 +7,14 @@
         detachedCallback : detachedCallback
     });
 
-    document.registerElement('netris-controller', { prototype : proto });
+    window.NetrisControllerElement = document.registerElement('netris-controller', { prototype : proto });
 
-    // attachedCallback :: @netris-controller, undefined -> undefined
+    // attachedCallback :: @NetrisControllerElement, undefined -> undefined
     function attachedCallback() {
         document.addEventListener('keydown', this.keyHandler);
     }
 
-    // createdCallback :: @netris-controller, undefined -> undefined
+    // createdCallback :: @NetrisControllerElement, undefined -> undefined
     function createdCallback() {
         this.keys                        = {};
         this.keys[this.dataset.downKey]  = 'down';
@@ -23,12 +23,12 @@
         this.keyHandler                  = keyHandler.bind(this);
     }
 
-    // detachedCallback :: @netris-controller, undefined -> undefined
+    // detachedCallback :: @NetrisControllerElement, undefined -> undefined
     function detachedCallback() {
         document.removeEventListener('keydown', this.keyHandler);
     }
 
-    // keyHandler :: @netris-controller, KeyboardEvent -> undefined
+    // keyHandler :: @NetrisControllerElement, KeyboardEvent -> undefined
     function keyHandler(e) {
         var key = e.keyIdentifier.toLowerCase(),
             dir = this.keys[key];
