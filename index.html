@@ -22,28 +22,41 @@
                 display    : block;
                 height     : 20px;
                 left       : 0;
+                outline    : 1px solid #333;
                 position   : absolute;
                 top        : 0;
                 width      : 20px;
                 z-index    : 10;
             }
-            netris-block[data-player="Noah"] {
+            [data-player="Noah"] netris-block {
                 background : red;
             }
-            netris-block[data-player="Imelda"] {
+            [data-player="Imelda"] netris-block {
                 background : blue;
+            }
+            netris-shape {
+                display  : block;
+                height   : 0;
+                overflow : visible;
+                width    : 0;
             }
         </style>
     </head>
     <body>
         <netris-board data-block-size="20">
-            <netris-block data-pos-left="200" data-pos-top="0" data-fall-rate="1" data-player="Noah"></netris-block>
-            <netris-block data-pos-left="100" data-pos-top="0" data-fall-rate="1" data-player="Imelda"></netris-block>
+            <netris-shape-square data-pos-left="200" data-pos-top="0" data-fall-rate="1" data-player="Noah"></netris-shape-square>
+            <netris-shape-square data-pos-left="100" data-pos-top="0" data-fall-rate="1" data-player="Imelda"></netris-shape-square>
         </netris-board>
-        <netris-controller data-left-key="left" data-down-key="down" data-right-key="right" data-player="Noah"></netris-controller>
-        <netris-controller data-left-key="u+0041" data-down-key="u+0053" data-right-key="u+0044" data-player="Imelda"></netris-controller>
+        <netris-controller data-left-key="left" data-down-key="down" data-right-key="right" data-rotate-key="up" data-player="Noah"></netris-controller>
+        <netris-controller data-left-key="u+0041" data-down-key="u+0053" data-right-key="u+0044" data-rotate-key="u+0057" data-player="Imelda"></netris-controller>
         <script src="src/netris-block.js"></script>
         <script src="src/netris-board.js"></script>
         <script src="src/netris-controller.js"></script>
+        <script src="src/netris-shape.js"></script>
+        <script src="src/netris-shape-line.js"></script>
+        <script src="src/netris-shape-square.js"></script>
+        <script src="src/netris-shape-t.js"></script>
+        <script src="src/netris-shape-z-left.js"></script>
+        <script src="src/netris-shape-z-right.js"></script>
     </body>
 </html>
