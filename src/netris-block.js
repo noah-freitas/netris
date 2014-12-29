@@ -4,7 +4,10 @@
     var proto = Object.assign(Object.create(HTMLElement.prototype), {
         attachedCallback : attachedCallback,
         canMove          : canMove,
-        move             : move
+        canMoveTo        : canMoveTo,
+        move             : move,
+        moveTo           : moveTo,
+        remove           : remove
     });
 
     window.NetrisBlockElement = document.registerElement('netris-block', { prototype : proto });
@@ -38,10 +41,19 @@
         return points.every(pointIsElOrBoard, this);
     }
 
-    // pointIsElOrBoard :: @NetrisBlockElement, [Number, Number] -> Boolean
-    function pointIsElOrBoard(point) {
-        var pointEl = document.elementFromPoint(point[0], point[1]);
-        return pointEl === this || pointEl === this.board ;
+    // canMoveTo :: @NetrisBlockElement, Number, Number, Boolean -> Boolean
+    function canMoveTo(xDiff, yDiff, allowAbove) {
+        var dims   = this.getBoundingClientRect(),
+            top    = dims.top    + yDiff,
+            right  = dims.right  + xDiff - 1,
+            bottom = dims.bottom + yDiff - 1,
+            left   = dims.left   + xDiff;
+
+        if (allowAbove && top < 0) return true;
+
+        var points = [[left, top], [right, top], [left, bottom], [right, bottom]];
+
+        return points.every(pointIsElOrBoard, this);
     }
 
     // move :: @NetrisBlockElement, String, Number -> undefined
@@ -53,5 +65,24 @@
             case 'left'  : this.style.left = this.offsetLeft - distance + 'px'; break;
             case 'right' : this.style.left = this.offsetLeft + distance + 'px'; break;
         }
+    }
+
+    // moveTo :: @NetrisBlockElement, Number, Number -> undefined
+    function moveTo(xDiff, yDiff) {
+        this.style.top  = this.offsetTop  + yDiff + 'px';
+        this.style.left = this.offsetLeft + xDiff + 'px';
+    }
+
+    // pointIsElOrBoard :: @NetrisBlockElement, [Number, Number] -> Boolean
+    function pointIsElOrBoard(point) {
+        var pointEl = document.elementFromPoint(point[0], point[1]);
+        return pointEl === this || pointEl === this.board ;
+    }
+
+    // remove :: @NetrisBlockElement, undefined -> undefined
+    function remove() {
+        var parent = this.parentElement;
+        HTMLElement.prototype.remove.call(this);
+        parent.dispatchEvent(new CustomEvent('netris-block:removed', { detail : this }));
     }
 }());

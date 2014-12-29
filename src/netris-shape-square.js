@@ -2,10 +2,25 @@
     'use strict';
 
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
-        makeBlocks : makeBlocks
+        blockRemoved : blockRemoved,
+        makeBlocks   : makeBlocks
     });
 
     window.NetrisShapeSquareElement = document.registerElement('netris-shape-square', { prototype : proto });
+
+    // blockRemoved :: @NetrisShapeSquareElement, Event -> undefined
+    function blockRemoved(e) {
+        var withoutRemoved = without(e.detail);
+        this.blocks        = this.blocks.filter(withoutRemoved);
+        this.downBlocks    = this.downBlocks.filter(withoutRemoved);
+        if (this.downBlocks.length === 0) this.downBlocks = this.blocks;
+
+        NetrisShapeElement.prototype.blockRemoved.call(this, e);
+
+        function without(x) {
+            return function (y) { return x !== y; };
+        }
+    }
 
     // makeBlocks :: @NetrisShapeSquareElement, undefined -> undefined
     function makeBlocks() {

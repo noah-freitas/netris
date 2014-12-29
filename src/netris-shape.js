@@ -3,10 +3,12 @@
 
     var proto = Object.assign(Object.create(HTMLElement.prototype), {
         attachedCallback : attachedCallback,
+        blockRemoved     : blockRemoved,
         canMove          : canMove,
         createdCallback  : createdCallback,
         fall             : fall,
         move             : move,
+        rotate           : rotate,
         stopFalling      : stopFalling
     });
 
@@ -17,7 +19,13 @@
         this.board       = this.parentElement;
         this.moveHandler = moveHandler.bind(this, Number(this.board.dataset.blockSize));
         this.makeBlocks();
+        this.addEventListener('netris-block:removed', this.blockRemovedLis);
         if (this.dataset.player) document.addEventListener('netris-controller:move:' + this.dataset.player, this.moveHandler);
+    }
+
+    // blockRemoved :: @NetrisShapeElement, Event -> undefined
+    function blockRemoved(e) {
+        if (this.children.length === 0) this.remove();
     }
 
     // canMove :: @NetrisShapeElement, String, Number -> Boolean
@@ -31,6 +39,7 @@
 
     // createdCallback :: @NetrisShapeElement, undefined -> undefined
     function createdCallback() {
+        this.blockRemovedLis  = this.blockRemoved.bind(this);
         this.dataset.falling  = this.dataset.falling  || 'true';
         this.dataset.fallRate = this.dataset.fallRate || '1';
     }
@@ -50,7 +59,13 @@
 
     // move :: @NetrisShapeElement, Number, Event -> undefined
     function moveHandler(distance, e) {
+        if (e.detail === 'rotate') { this.rotate(); return; }
         if (this.canMove(e.detail, distance)) this.move(e.detail, distance);
+    }
+
+    // rotate :: @NetrisShapeElement, undefined -> undefined
+    function rotate() {
+        console.log('rotating: ', this);
     }
 
     // stopFalling :: @NetrisShapeElement, undefined -> undefined

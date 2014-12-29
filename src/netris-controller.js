@@ -16,11 +16,12 @@
 
     // createdCallback :: @NetrisControllerElement, undefined -> undefined
     function createdCallback() {
-        this.keys                        = {};
-        this.keys[this.dataset.downKey]  = 'down';
-        this.keys[this.dataset.leftKey]  = 'left';
-        this.keys[this.dataset.rightKey] = 'right';
-        this.keyHandler                  = keyHandler.bind(this);
+        this.keys                         = {};
+        this.keys[this.dataset.downKey]   = 'down';
+        this.keys[this.dataset.leftKey]   = 'left';
+        this.keys[this.dataset.rightKey]  = 'right';
+        this.keys[this.dataset.rotateKey] = 'rotate';
+        this.keyHandler                   = keyHandler.bind(this);
     }
 
     // detachedCallback :: @NetrisControllerElement, undefined -> undefined

@@ -2,6 +2,7 @@
     'use strict';
 
     var shapes = [
+        'netris-shape-line',
         'netris-shape-square'
     ];
 
@@ -9,7 +10,9 @@
         addShape         : addShape,
         adjustRows       : adjustRows,
         attachedCallback : attachedCallback,
+        clearRows        : clearRows,
         createdCallback  : createdCallback,
+        dropShapes       : dropShapes,
         getRows          : getRows,
         makeRows         : makeRows,
         randomShape      : randomShape
@@ -36,18 +39,24 @@
 
     // adjustRows :: @NetrisBoardElement, undefined -> undefined
     function adjustRows() {
+        while (this.clearRows()) while (this.dropShapes()) undefined;
+    }
+
+    // clearRows :: @NetrisBoardElement, undefined -> undefined
+    function clearRows() {
+        var cleared = false;
+
         this.getRows().reverse().forEach(function (row) {
-            // If the row is full.
-            if (row.every(function (b) { return b !== null; })) {
-                // Remove all the blocks.
-                row.forEach(function (b) { b.remove(); });
-            } else {
-                // Otherwise try to drop the blocks.
-                row.forEach(function (b) {
-                    if (b) b.move({ detail: 'down' }, Number(this.dataset.blockSize));
-                }, this);
+            if (row.every(isntNull)) {
+                cleared = true;
+                row.forEach(clearBlock);
             }
         }, this);
+
+        return cleared;
+
+        function clearBlock(b) { b.remove(); }
+        function isntNull(b) { return b !== null; }
     }
 
     // createdCallback :: @NetrisBoardElement, undefined -> undefined
@@ -59,6 +68,21 @@
         this.makeRows        = makeRows.bind(this);
         this.shapeStopped    = shapeStopped.bind(this);
         this.stoppedBlockSel = shapes.map(function (s) { return s + '[data-falling="false"] netris-block'; }).join(', ');
+        this.stoppedShapeSel = shapes.map(function (s) { return s + '[data-falling="false"]'; }).join(', ');
+    }
+
+    // dropShapes :: @NetrisBoardElement, undefined -> Boolean
+    function dropShapes() {
+        var dropped = false;
+
+        Array.from(this.querySelectorAll(this.stoppedShapeSel)).sort(sortShapes).forEach(function (s) {
+            if (s.canMove('down')) {
+                dropped = true;
+                s.move('down');
+            }
+        });
+
+        return dropped;
     }
 
     // emptyRows :: NetrisBoardElement, Number -> [[null]]
@@ -76,10 +100,10 @@
         alert('Game over!');
     }
 
-    // fallShapes :: @NetrisBoardElement, unefined -> undefined
+    // fallShapes :: @NetrisBoardElement, undefined -> undefined
     function fallShapes() {
         Array.from(this.querySelectorAll(this.fallingShapeSel))
-             .sort(function (s1, s2) { return s2.offsetTop - s1.offsetTop; })
+             .sort(sortShapes)
              .forEach(function (s) { s.fall(); });
 
         if (!this.gameOver) requestAnimationFrame(this.fallShapes);
@@ -112,5 +136,10 @@
     function shapeStopped(e) {
         this.adjustRows();
         this.addShape(e.target);
+    }
+
+    // sortShapes :: NetrisShapeElement, NetrisShapeElement -> Number
+    function sortShapes(s1, s2) {
+        return s2.offsetTop - s1.offsetTop;
     }
 }());
