@@ -3,7 +3,8 @@
 
     var shapes = [
         'netris-shape-line',
-        'netris-shape-square'
+        'netris-shape-square',
+        'netris-shape-z-left'
     ];
 
     var proto = Object.assign(Object.create(HTMLElement.prototype), {

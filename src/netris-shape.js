@@ -64,9 +64,7 @@
     }
 
     // rotate :: @NetrisShapeElement, undefined -> undefined
-    function rotate() {
-        console.log('rotating: ', this);
-    }
+    function rotate() {}
 
     // stopFalling :: @NetrisShapeElement, undefined -> undefined
     function stopFalling() {

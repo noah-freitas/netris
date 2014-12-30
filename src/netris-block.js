@@ -67,10 +67,11 @@
         }
     }
 
-    // moveTo :: @NetrisBlockElement, Number, Number -> undefined
+    // moveTo :: @NetrisBlockElement, Number, Number -> Boolean
     function moveTo(xDiff, yDiff) {
         this.style.top  = this.offsetTop  + yDiff + 'px';
         this.style.left = this.offsetLeft + xDiff + 'px';
+        return true;
     }
 
     // pointIsElOrBoard :: @NetrisBlockElement, [Number, Number] -> Boolean
