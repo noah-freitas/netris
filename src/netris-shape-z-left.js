@@ -9,6 +9,18 @@
 
     window.NetrisShapeZLeftElement = document.registerElement('netris-shape-z-left', { prototype : proto });
 
+    // addBlocks :: @NetrisShapeZLeftElement, undefined -> undefined
+    function addBlocks() {
+        this.blocks = [
+            document.createElement('netris-block'),
+            document.createElement('netris-block'),
+            document.createElement('netris-block'),
+            document.createElement('netris-block')
+        ];
+
+        this.blocks.forEach(function (b) { this.appendChild(b); }, this);
+    }
+
     // blockRemoved :: @NetrisShapeZLeftElement, Event -> undefined
     function blockRemoved(e) {
         var removedIndex = this.blocks.indexOf(e.detail);
@@ -47,17 +59,16 @@
 
     // makeBlocks :: @NetrisShapeZLeftElement, undefined -> undefined
     function makeBlocks() {
-        var blocks    = [
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block')
-            ],
-            blockSize = Number(this.board.dataset.blockSize),
+        state.call(this, 1);
+    }
+
+    // positionBlocks :: @NetrisShapeZLeftElement, undefined -> undefined
+    function positionBlocks() {
+        var blockSize = Number(this.board.dataset.blockSize),
             left      = Number(this.dataset.posLeft),
             top       = Number(this.dataset.posTop);
 
-        blocks.forEach(function (b, i) {
+        this.blocks.forEach(function (b, i) {
             b.dataset.posLeft = i === 0 ? left :
                                 i <   3 ? left + blockSize
                                         : left + blockSize * 2;
@@ -65,14 +76,13 @@
             b.dataset.posTop  = i < 2   ? top
                                         : top  + blockSize;
 
-            this.appendChild(b);
+            // TODO: I shouldn't have to set both the style and data-* attributes,
+            //       but this is currently required so that the shape will fall at
+            //       first.
+
+            b.style.left = b.dataset.posLeft + 'px';
+            b.style.top  = b.dataset.posTop  + 'px';
         }, this);
-
-        this.blocks = blocks;
-        this.state  = 1;
-        state.call(this, 2);
-
-        Object.defineProperty(this, 'offsetTop', { get : function () { return this.children[0].offsetTop; } });
     }
 
     // rotate :: @NetrisShapeZLeftElement, undefined -> undefined
@@ -88,60 +98,74 @@
     function state(num) {
         var blockSize = Number(this.board.dataset.blockSize);
 
-        switch (num) {
-            case 1  :
-                fromState.call(this, [2]);
+        switch (true) {
+            case num === 1 && this.state === undefined :
+                addBlocks.call(this);
+                positionBlocks.call(this);
+
+                Object.defineProperty(this, 'offsetTop', { get : function () {
+                    return this.children[0].offsetTop;
+                } });
+
+                this.leftBlocks  = [this.blocks[0], this.blocks[2]];
+                this.rightBlocks = [this.blocks[1], this.blocks[3]];
+                this.downBlocks  = [this.blocks[0], this.blocks[2], this.blocks[3]];
+                break;
+
+            case num === 1 && this.state === 2   :
                 rotateEl.call(this);
                 this.leftBlocks  = [this.blocks[0], this.blocks[2]];
                 this.rightBlocks = [this.blocks[1], this.blocks[3]];
                 this.downBlocks  = [this.blocks[0], this.blocks[2], this.blocks[3]];
                 break;
-            case 2  :
-                fromState.call(this, [1]);
+
+            case num === 2 && this.state === 1   :
                 rotateEl.call(this);
                 this.leftBlocks  = [this.blocks[0], this.blocks[1], this.blocks[2]];
                 this.rightBlocks = [this.blocks[0], this.blocks[2], this.blocks[3]];
                 this.downBlocks  = [this.blocks[2], this.blocks[3]];
                 break;
-            case 3  :
-                fromState.call(this, [1]);
+
+            case num === 3 && this.state === 1   :
                 this.downBlocks  = [this.blocks[0], this.blocks[1]];
                 break;
-            case 4  :
-                fromState.call(this, [1]);
+
+            case num === 4 && this.state === 1   :
                 this.downBlocks  = [this.blocks[2], this.blocks[3]];
                 break;
-            case 5  :
-                fromState.call(this, [2]);
+
+            case num === 5 && this.state === 2   :
                 this.downBlocks  = [this.blocks[2], this.blocks[3]];
                 break;
-            case 6  :
-                fromState.call(this, [2]);
+
+            case num === 6 && this.state === 2   :
                 this.downBlocks  = [this.blocks[1], this.blocks[3]];
                 break;
-            case 7  :
-                fromState.call(this, [5, 10]);
+
+            case num === 7 && this.state === 5   :
+            case num === 7 && this.state === 10  :
                 this.downBlocks  = [this.blocks[2]];
                 break;
-            case 8  :
-                fromState.call(this, [5, 6]);
+
+            case num === 8 && this.state === 5   :
+            case num === 8 && this.state === 6   :
                 this.downBlocks  = [this.blocks[1], this.blocks[3]];
                 break;
-            case 9  :
-                fromState.call(this, [6]);
+
+            case num === 9 && this.state === 6   :
                 this.downBlocks  = [this.blocks[0]];
                 break;
-            case 10 :
-                fromState.call(this, [2]);
+
+            case num === 10 && this.state === 2  :
                 this.blocks[0].move('down');
                 this.downBlocks  = [this.blocks[0], this.blocks[2]];
                 break;
-            case 11 :
-                fromState.call(this, [10]);
+
+            case num === 11 && this.state === 10 :
                 this.downBlocks  = [this.blocks[0]];
                 break;
-            default :
-                throw new Error('Unknown to state ', num);
+
+            default : stateError.call(this);
         }
 
         if (num > 2) {
@@ -150,11 +174,6 @@
         }
 
         this.state = num;
-
-        // fromState :: @NetrisShapeZLeftElement, [Number] -> undefined
-        function fromState(from) {
-            if (from.indexOf(this.state) === -1) stateError.call(this);
-        }
 
         // rotateEl :: @NetrisShapeZLeftElement, undefined -> undefined
         function rotateEl() {
