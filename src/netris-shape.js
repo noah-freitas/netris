@@ -2,6 +2,7 @@
     'use strict';
 
     var proto = Object.assign(Object.create(HTMLElement.prototype), {
+        addBlocks        : addBlocks,
         attachedCallback : attachedCallback,
         blockRemoved     : blockRemoved,
         canMove          : canMove,
@@ -13,6 +14,12 @@
     });
 
     window.NetrisShapeElement = document.registerElement('netris-shape', { prototype : proto });
+
+    // addBlocks :: @NetrisShapeElement, Number -> undefined
+    function addBlocks(num) {
+        this.blocks = new Array(num).join(' ').split(' ').map(function () { return document.createElement('netris-block'); });
+        this.blocks.forEach(function (b) { this.appendChild(b); }, this);
+    }
 
     // attachedCallback :: @NetrisShapeElement, undefined -> undefined
     function attachedCallback() {

@@ -2,24 +2,17 @@
     'use strict';
 
     var proto = Object.assign(Object.create(HTMLElement.prototype), {
-        attributeChangedCallback : attributeChangedCallback,
-        attachedCallback         : attachedCallback,
-        canMove                  : canMove,
-        canMoveTo                : canMoveTo,
-        move                     : move,
-        moveTo                   : moveTo,
-        remove                   : remove
+        attachedCallback : attachedCallback,
+        canMove          : canMove,
+        canMoveTo        : canMoveTo,
+        move             : move,
+        moveTo           : moveTo,
+        remove           : remove,
+        x                : x,
+        y                : y
     });
 
     window.NetrisBlockElement = document.registerElement('netris-block', { prototype : proto });
-
-    // attributeChangedCallback :: @NetrisBlockElement, undefined -> undefined
-    function attributeChangedCallback(name, val) {
-        switch (name) {
-            case 'data-pos-left' : this.style.left = val + 'px'; break;
-            case 'data-pos-top'  : this.style.top  = val + 'px'; break;
-        }
-    }
 
     // attachedCallback :: @NetrisBlockElement, undefined -> undefined
     function attachedCallback() {
@@ -94,5 +87,17 @@
         var parent = this.parentElement;
         HTMLElement.prototype.remove.call(this);
         parent.dispatchEvent(new CustomEvent('netris-block:removed', { detail : this }));
+    }
+
+    // x :: @NetrisBlockElement, Number -> undefined
+    function x(xCoor) {
+        this.style.left = xCoor + 'px';
+        if (!this.dataset.posLeft) this.dataset.posLeft = xCoor;
+    }
+
+    // y :: @NetrisBlockElement, Number -> undefined
+    function y(yCoor) {
+        this.style.top = yCoor + 'px';
+        if (!this.dataset.posTop) this.dataset.posTop = yCoor;
     }
 }());
