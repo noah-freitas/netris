@@ -3,93 +3,245 @@
 
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
-        makeBlocks   : makeBlocks,
-        rotate       : rotate
+        rotate       : rotate,
+        rotateOrTest : rotateOrTest,
+        stateFn      : state
     });
 
     window.NetrisShapeLineElement = document.registerElement('netris-shape-line', { prototype : proto });
 
     // blockRemoved :: @NetrisShapeLineElement, Event -> undefined
     function blockRemoved(e) {
-        if (this.state === 2) {
-            var removeIndex    = this.blocks.indexOf(e.detail),
-                withoutRemoved = without(e.detail);
+        var removedIndex = this.blocks.indexOf(e.detail);
 
-            this.blocks.slice(0, removeIndex).forEach(function (b) { b.move('down'); });
-
-            this.blocks        = this.blocks.filter(withoutRemoved);
-            this.downBlocks    = this.downBlocks.filter(withoutRemoved);
-            if (this.downBlocks.length === 0) this.downBlocks = [this.blocks[this.blocks.length - 1]];
+        switch (this.state) {
+            // 2 -> 3 || 4 || 5 || 6
+            case 2 : switch (removedIndex) {
+                case 0 : this.state = 3; break;
+                case 1 : this.state = 4; break;
+                case 2 : this.state = 5; break;
+                case 3 : this.state = 6; break;
+            } break;
+            // 3 -> 7 || 8 || 9
+            case 3 : switch (removedIndex) {
+                case 1 : this.state = 7; break;
+                case 2 : this.state = 8; break;
+                case 3 : this.state = 9; break;
+            } break;
+            // 4 -> 7 || 10 || 11
+            case 4 : switch (removedIndex) {
+                case 0 : this.state = 7; break;
+                case 2 : this.state = 10; break;
+                case 3 : this.state = 11; break;
+            } break;
+            // 5 -> 8 || 10 || 12
+            case 5 : switch (removedIndex) {
+                case 0 : this.state = 8; break;
+                case 1 : this.state = 10; break;
+                case 3 : this.state = 12; break;
+            } break;
+            // 6 -> 9 || 11 || 13
+            case 6 : switch (removedIndex) {
+                case 0 : this.state = 9; break;
+                case 1 : this.state = 11; break;
+                case 2 : this.state = 13; break;
+            } break;
+            // 7 -> 14 || 15
+            case 7 : switch (removedIndex) {
+                case 2 : this.state = 14; break;
+                case 3 : this.state = 15; break;
+            } break;
+            // 8 -> 14 || 16
+            case 8 : switch (removedIndex) {
+                case 1 : this.state = 14; break;
+                case 3 : this.state = 16; break;
+            } break;
+            // 9 -> 15 || 17
+            case 9 : switch (removedIndex) {
+                case 1 : this.state = 15; break;
+                case 2 : this.state = 17; break;
+            } break;
+            // 10 -> 14 || 18
+            case 10 : switch (removedIndex) {
+                case 0 : this.state = 14; break;
+                case 3 : this.state = 18; break;
+            } break;
+            // 11 -> 15 || 19
+            case 11 : switch (removedIndex) {
+                case 0 : this.state = 15; break;
+                case 2 : this.state = 19; break;
+            } break;
+            // 12 -> 16 || 19
+            case 12 : switch (removedIndex) {
+                case 0 : this.state = 16; break;
+                case 1 : this.state = 19; break;
+            } break;
+            // 13 -> 17 || 20
+            case 13 : switch (removedIndex) {
+                case 0 : this.state = 17; break;
+                case 1 : this.state = 20; break;
+            } break;
         }
 
         NetrisShapeElement.prototype.blockRemoved.call(this, e);
-
-        function without(x) {
-            return function (y) { return x !== y; };
-        }
     }
 
-    // makeBlocks :: @NetrisShapeLineElement, undefined -> undefined
-    function makeBlocks() {
-        var blocks    = [
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block')
-            ],
-            blockSize = Number(this.board.dataset.blockSize),
+    // positionBlocks :: @NetrisShapeLineElement, undefined -> undefined
+    function positionBlocks() {
+        var blockSize = Number(this.board.dataset.blockSize),
             left      = Number(this.dataset.posLeft),
             top       = Number(this.dataset.posTop);
 
-        blocks.forEach(function (b, i) {
-            b.dataset.posLeft = i * blockSize + left;
-            b.dataset.posTop  = top;
-            this.appendChild(b);
+        this.blocks.forEach(function (b, i) {
+            b.x(i * blockSize + left);
+            b.y(top);
         }, this);
-
-        this.state       = 1;
-        this.blocks      = blocks;
-        this.leftBlocks  = [this.children[0]];
-        this.rightBlocks = [this.children[3]];
-        this.downBlocks  = this.blocks;
-
-        Object.defineProperty(this, 'offsetTop', { get : function () { return this.children[0].offsetTop; } });
     }
 
     // rotate :: @NetrisShapeLineElement, undefined -> undefined
     function rotate() {
+        try {
+            this.state = this.state === 1 ? 2 : 1;
+        } catch (err) {
+            if (err.name !== 'InvalidStateTransition') throw err;
+        }
+    }
+
+    // rotateOrTest :: @NetrisShapeLineElement, Boolean -> Boolean
+    function rotateOrTest(test) {
         var blockSize = Number(this.board.dataset.blockSize),
-            self      = this;
+            state     = this.state;
 
-        if (this.blocks.every(rotateLine(true))) {
-            this.blocks.forEach(rotateLine(false));
+        return this.blocks.every(function (b, i) {
+            var diff  = (3 - i) * blockSize;
 
-            switch (this.state) {
-                case 1 :
-                    this.leftBlocks  = this.blocks;
-                    this.rightBlocks = this.blocks;
-                    this.downBlocks  = [this.children[3]];
-                    this.state       = 2;
-                    break;
-                case 2 :
-                    this.leftBlocks  = [this.children[0]];
-                    this.rightBlocks = [this.children[3]];
-                    this.downBlocks  = this.blocks;
-                    this.state       = 1;
-                    break;
-            }
+            return diff === 0
+                 ? true
+                 : b[test ? 'canMoveTo' : 'moveTo'](state === 1 ? diff : -diff, state === 1 ? -diff : diff, true);
+        }, this);
+    }
+
+    // state :: @NetrisShapeLineElement, Number -> undefined
+    function state(num) {
+        var blockSize = Number(this.board.dataset.blockSize);
+
+        switch (true) {
+            case num === 1 && this.state === undefined :
+                this.addBlocks(4);
+                positionBlocks.call(this);
+
+            case num === 1 && this.state === 2 :
+                if (this.state) this.rotateEl(num);
+
+                this.leftBlocks  = [this.blocks[0]];
+                this.rightBlocks = [this.blocks[3]];
+                this.downBlocks  = this.blocks;
+                break;
+
+            case num === 2 && this.state === 1 :
+                this.rotateEl(num);
+                this.leftBlocks  = this.blocks;
+                this.rightBlocks = this.blocks;
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 3 && this.state === 2   :
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 4 && this.state === 2   :
+                this.blocks[0].move('down');
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 5 && this.state === 2   :
+                this.blocks[0].move('down');
+                this.blocks[1].move('down');
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 6 && this.state === 2   :
+                this.downBlocks  = [this.blocks[2]];
+                break;
+
+            case num === 7 && this.state === 3   :
+            case num === 7 && this.state === 4   :
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 8 && this.state === 3   :
+                this.blocks[1].move('down');
+            case num === 8 && this.state === 5   :
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 9 && this.state === 3   :
+            case num === 9 && this.state === 6   :
+                this.downBlocks  = [this.blocks[2]];
+                break;
+
+            case num === 10 && this.state === 4  :
+            case num === 10 && this.state === 5  :
+                this.blocks[0].move('down');
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 11 && this.state === 5  :
+            case num === 11 && this.state === 6  :
+                this.downBlocks  = [this.blocks[2]];
+                break;
+
+            case num === 12 && this.state === 5  :
+                this.downBlocks  = [this.blocks[1]];
+                break;
+
+            case num === 13 && this.state === 6  :
+                this.downBlocks  = [this.blocks[1]];
+                break;
+
+            case num === 14 && this.state === 7  :
+            case num === 14 && this.state === 8  :
+            case num === 14 && this.state === 10 :
+                this.downBlocks  = [this.blocks[3]];
+                break;
+
+            case num === 15 && this.state === 7  :
+            case num === 15 && this.state === 9  :
+            case num === 15 && this.state === 11 :
+                this.downBlocks  = [this.blocks[2]];
+                break;
+
+            case num === 16 && this.state === 8  :
+            case num === 16 && this.state === 12 :
+                this.downBlocks  = [this.blocks[1]];
+                break;
+
+            case num === 17 && this.state === 9  :
+            case num === 17 && this.state === 13 :
+                this.downBlocks  = [this.blocks[1]];
+                break;
+
+            case num === 18 && this.state === 10 :
+                this.downBlocks  = [this.blocks[0]];
+                break;
+
+            case num === 19 && this.state === 11 :
+            case num === 19 && this.state === 12 :
+                this.downBlocks  = [this.blocks[0]];
+                break;
+
+            case num === 20 && this.state === 13 :
+                this.downBlocks  = [this.blocks[0]];
+                break;
+
+            default : this.stateError(num);
         }
 
-        // rotateLine :: Boolean -> (NetrisBlockElement, Number -> Boolean || undefined)
-        function rotateLine(test) {
-            return function (b, i) {
-                var diff  = (3 - i) * blockSize,
-                    state = self.state;
-
-                return diff === 0
-                     ? true
-                     : b[test ? 'canMoveTo' : 'moveTo'](state === 1 ? diff : -diff, state === 1 ? -diff : diff, true);
-            };
+        if (num > 2) {
+            this.leftBlocks  = [];
+            this.rightBlocks = [];
         }
+
+        this.currentState = num;
     }
 }());

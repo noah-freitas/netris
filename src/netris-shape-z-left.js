@@ -3,9 +3,9 @@
 
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
-        makeBlocks   : makeBlocks,
         rotate       : rotate,
-        rotateOrTest : rotateOrTest
+        rotateOrTest : rotateOrTest,
+        stateFn      : state
     });
 
     window.NetrisShapeZLeftElement = document.registerElement('netris-shape-z-left', { prototype : proto });
@@ -17,38 +17,33 @@
         switch (this.state) {
             // 1 -> 3 || 4
             case 1 : switch (removedIndex) {
-                case 0 : state.call(this, 4); break;
-                case 2 : state.call(this, 3); break;
+                case 0 : this.state = 4; break;
+                case 2 : this.state = 3; break;
             } break;
             // 2 -> 5 || 6 || 10
             case 2 : switch (removedIndex) {
-                case 0 : state.call(this, 5); break;
-                case 1 : state.call(this, 10); break;
-                case 2 : state.call(this, 6); break;
+                case 0 : this.state = 5; break;
+                case 1 : this.state = 10; break;
+                case 2 : this.state = 6; break;
             } break;
             // 5 -> 7 || 8
             case 5 : switch (removedIndex) {
-                case 1 : state.call(this, 7); break;
-                case 2 : state.call(this, 8); break;
+                case 1 : this.state = 7; break;
+                case 2 : this.state = 8; break;
             } break;
             // 6 -> 8 || 9
             case 6 : switch (removedIndex) {
-                case 0 : state.call(this, 8); break;
-                case 1 : state.call(this, 9); break;
+                case 0 : this.state = 8; break;
+                case 1 : this.state = 9; break;
             } break;
             // 10 -> 7 || 11
             case 10 : switch (removedIndex) {
-                case 0 : state.call(this, 7); break;
-                case 2 : state.call(this, 11); break;
+                case 0 : this.state = 7; break;
+                case 2 : this.state = 11; break;
             } break;
         }
 
         NetrisShapeElement.prototype.blockRemoved.call(this, e);
-    }
-
-    // makeBlocks :: @NetrisShapeZLeftElement, undefined -> undefined
-    function makeBlocks() {
-        state.call(this, 1);
     }
 
     // positionBlocks :: @NetrisShapeZLeftElement, undefined -> undefined
@@ -70,7 +65,7 @@
     // rotate :: @NetrisShapeZLeftElement, undefined -> undefined
     function rotate() {
         try {
-            state.call(this, this.state === 1 ? 2 : 1);
+            this.state = this.state === 1 ? 2 : 1;
         } catch (err) {
             if (err.name !== 'InvalidStateTransition') throw err;
         }
@@ -94,17 +89,9 @@
                 this.addBlocks(4);
                 positionBlocks.call(this);
 
-                Object.defineProperty(this, 'offsetTop', { get : function () {
-                    return this.children[0].offsetTop;
-                } });
-
-                this.leftBlocks  = [this.blocks[0], this.blocks[2]];
-                this.rightBlocks = [this.blocks[1], this.blocks[3]];
-                this.downBlocks  = [this.blocks[0], this.blocks[2], this.blocks[3]];
-                break;
-
             case num === 1 && this.state === 2   :
-                this.rotateEl(num);
+                if (this.state) this.rotateEl(num);
+
                 this.leftBlocks  = [this.blocks[0], this.blocks[2]];
                 this.rightBlocks = [this.blocks[1], this.blocks[3]];
                 this.downBlocks  = [this.blocks[0], this.blocks[2], this.blocks[3]];
@@ -164,6 +151,6 @@
             this.rightBlocks = [];
         }
 
-        this.state = num;
+        this.currentState = num;
     }
 }());

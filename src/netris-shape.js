@@ -27,7 +27,7 @@
     function attachedCallback() {
         this.board       = this.parentElement;
         this.moveHandler = moveHandler.bind(this, Number(this.board.dataset.blockSize));
-        this.makeBlocks();
+        this.state       = 1;
         this.addEventListener('netris-block:removed', this.blockRemovedLis);
         if (this.dataset.player) document.addEventListener('netris-controller:move:' + this.dataset.player, this.moveHandler);
     }
@@ -51,6 +51,15 @@
         this.blockRemovedLis  = this.blockRemoved.bind(this);
         this.dataset.falling  = this.dataset.falling  || 'true';
         this.dataset.fallRate = this.dataset.fallRate || '1';
+
+        Object.defineProperty(this, 'state', {
+            get : function () { return this.currentState; },
+            set : this.stateFn
+        });
+
+        Object.defineProperty(this, 'offsetTop', { get : function () {
+            return this.children[0].offsetTop;
+        } });
     }
 
     // fall :: @NetrisShapeElement, undefined -> undefined

@@ -3,9 +3,9 @@
 
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
-        makeBlocks   : makeBlocks,
         rotate       : rotate,
-        rotateOrTest : rotateOrTest
+        rotateOrTest : rotateOrTest,
+        stateFn      : state
     });
 
     window.NetrisShapeTElement = document.registerElement('netris-shape-t', { prototype : proto });
@@ -17,64 +17,59 @@
         switch (this.state) {
             // 1 -> 5 || 6
             case 1 : switch (removedIndex) {
-                case 0 : state.call(this, 6); break;
-                case 1 : state.call(this, 5); break;
+                case 0 : this.state = 6; break;
+                case 1 : this.state = 5; break;
             } break;
             // 2 -> 7 || 8 || 9
             case 2 : switch (removedIndex) {
-                case 1 : state.call(this, 7); break;
-                case 2 : state.call(this, 8); break;
-                case 3 : state.call(this, 9); break;
+                case 1 : this.state = 7; break;
+                case 2 : this.state = 8; break;
+                case 3 : this.state = 9; break;
             } break;
             // 3 -> 14 || 15
             case 3 : switch (removedIndex) {
-                case 0 : state.call(this, 15); break;
-                case 3 : state.call(this, 14); break;
+                case 0 : this.state = 15; break;
+                case 3 : this.state = 14; break;
             } break;
             // 4 -> 16 || 17 || 18
             case 4 : switch (removedIndex) {
-                case 0 : state.call(this, 17); break;
-                case 1 : state.call(this, 18); break;
-                case 3 : state.call(this, 16); break;
+                case 0 : this.state = 17; break;
+                case 1 : this.state = 18; break;
+                case 3 : this.state = 16; break;
             } break;
             // 7 -> 10 || 11
             case 7 : switch (removedIndex) {
-                case 2 : state.call(this, 11); break;
-                case 3 : state.call(this, 10); break;
+                case 2 : this.state = 11; break;
+                case 3 : this.state = 10; break;
             } break;
             // 8 -> 11 || 12
             case 8 : switch (removedIndex) {
-                case 1 : state.call(this, 11); break;
-                case 3 : state.call(this, 12); break;
+                case 1 : this.state = 11; break;
+                case 3 : this.state = 12; break;
             } break;
             // 9 -> 10 || 13
             case 9 : switch (removedIndex) {
-                case 1 : state.call(this, 10); break;
-                case 2 : state.call(this, 13); break;
+                case 1 : this.state = 10; break;
+                case 2 : this.state = 13; break;
             } break;
             // 16 -> 19 || 20
             case 16 : switch (removedIndex) {
-                case 0 : state.call(this, 19); break;
-                case 1 : state.call(this, 20); break;
+                case 0 : this.state = 19; break;
+                case 1 : this.state = 20; break;
             } break;
             // 17 -> 19 || 21
             case 17 : switch (removedIndex) {
-                case 1 : state.call(this, 21); break;
-                case 3 : state.call(this, 19); break;
+                case 1 : this.state = 21; break;
+                case 3 : this.state = 19; break;
             } break;
             // 18 -> 20 || 22
             case 18 : switch (removedIndex) {
-                case 0 : state.call(this, 22); break;
-                case 3 : state.call(this, 20); break;
+                case 0 : this.state = 22; break;
+                case 3 : this.state = 20; break;
             } break;
         }
 
         NetrisShapeElement.prototype.blockRemoved.call(this, e);
-    }
-
-    // makeBlocks :: @NetrisShapeTElement, undefined -> undefined
-    function makeBlocks() {
-        state.call(this, 1);
     }
 
     // positionBlocks :: @NetrisShapeTElement, undefined -> undefined
@@ -92,7 +87,7 @@
     // rotate :: @NetrisShapeTElement, undefined -> undefined
     function rotate() {
         try {
-            state.call(this, this.state % 4 + 1);
+            this.state = this.state % 4 + 1;
         } catch (err) {
             if (err.name !== 'InvalidStateTransition') throw err;
         }
@@ -143,17 +138,8 @@
                 this.addBlocks(4);
                 positionBlocks.call(this);
 
-                Object.defineProperty(this, 'offsetTop', { get : function () {
-                    return this.children[0].offsetTop;
-                } });
-
-                this.leftBlocks  = [this.blocks[0], this.blocks[1]];
-                this.rightBlocks = [this.blocks[0], this.blocks[3]];
-                this.downBlocks  = [this.blocks[1], this.blocks[2], this.blocks[3]];
-                break;
-
             case num === 1 && this.state === 4   :
-                this.rotateEl(num);
+                if (this.state) this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[1]];
                 this.rightBlocks = [this.blocks[0], this.blocks[3]];
@@ -270,6 +256,6 @@
             this.rightBlocks = [];
         }
 
-        this.state = num;
+        this.currentState = num;
     }
 }());

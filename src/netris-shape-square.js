@@ -3,48 +3,65 @@
 
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
-        makeBlocks   : makeBlocks
+        stateFn      : state
     });
 
     window.NetrisShapeSquareElement = document.registerElement('netris-shape-square', { prototype : proto });
 
     // blockRemoved :: @NetrisShapeSquareElement, Event -> undefined
     function blockRemoved(e) {
-        var withoutRemoved = without(e.detail);
-        this.blocks        = this.blocks.filter(withoutRemoved);
-        this.downBlocks    = this.downBlocks.filter(withoutRemoved);
-        if (this.downBlocks.length === 0) this.downBlocks = this.blocks;
+        var removedIndex = this.blocks.indexOf(e.detail);
+
+        if (this.state === 1) switch (removedIndex) {
+            case 0 : this.state = 3; break;
+            case 2 : this.state = 2; break;
+        }
 
         NetrisShapeElement.prototype.blockRemoved.call(this, e);
-
-        function without(x) {
-            return function (y) { return x !== y; };
-        }
     }
 
-    // makeBlocks :: @NetrisShapeSquareElement, undefined -> undefined
-    function makeBlocks() {
-        var blocks    = [
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block'),
-                document.createElement('netris-block')
-            ],
-            blockSize = Number(this.board.dataset.blockSize),
+    // positionBlocks :: @NetrisShapeSquareElement, undefined -> undefined
+    function positionBlocks() {
+        var blockSize = Number(this.board.dataset.blockSize),
             left      = Number(this.dataset.posLeft),
             top       = Number(this.dataset.posTop);
 
-        blocks.forEach(function (b, i) {
-            b.dataset.posLeft = i % 2 === 0 ? left : left + blockSize;
-            b.dataset.posTop  = i < 2       ? top  : top  + blockSize;
-            this.appendChild(b);
+        this.blocks.forEach(function (b, i) {
+            b.x(i % 2 === 0 ? left : left + blockSize);
+            b.y(i < 2       ? top  : top  + blockSize);
         }, this);
+    }
 
-        this.blocks      = blocks;
-        this.leftBlocks  = [this.children[0], this.children[2]];
-        this.rightBlocks = [this.children[1], this.children[3]];
-        this.downBlocks  = [this.children[2], this.children[3]];
+    // state :: @NetrisShapeSquareElement, Number -> undefined
+    function state(num) {
+        var blockSize = Number(this.board.dataset.blockSize);
 
-        Object.defineProperty(this, 'offsetTop', { get : function () { return this.children[0].offsetTop; } });
+        switch (true) {
+            case num === 1 && this.state === undefined :
+                this.addBlocks(4);
+                positionBlocks.call(this);
+
+                this.leftBlocks  = [this.children[0], this.children[2]];
+                this.rightBlocks = [this.children[1], this.children[3]];
+                this.downBlocks  = [this.children[2], this.children[3]];
+                break;
+
+            case num === 2 && this.state === 1 :
+                this.downBlocks  = [this.blocks[0], this.blocks[1]];
+                break;
+
+            case num === 3 && this.state === 1 :
+                this.downBlocks  = [this.blocks[2], this.blocks[3]];
+                break;
+
+            default : this.stateError(num);
+        }
+
+        if (num > 1) {
+            this.leftBlocks  = [];
+            this.rightBlocks = [];
+        }
+
+        this.currentState = num;
     }
 }());
