@@ -4,7 +4,8 @@
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
         makeBlocks   : makeBlocks,
-        rotate       : rotate
+        rotate       : rotate,
+        rotateOrTest : rotateOrTest
     });
 
     window.NetrisShapeTElement = document.registerElement('netris-shape-t', { prototype : proto });
@@ -97,6 +98,42 @@
         }
     }
 
+    // rotateOrTest :: @NetrisShapeTElement, Boolean -> Boolean
+    function rotateOrTest(test) {
+        var coors = { 0 : [], 1 : [], 3 : [] },
+            nor   = Number(this.board.dataset.blockSize),
+            neg   = -nor;
+
+        switch (this.state) {
+            case 1 :
+                coors[0] = [nor, nor];
+                coors[1] = [nor, neg];
+                coors[3] = [neg, nor];
+                break;
+            case 2 :
+                coors[0] = [neg, nor];
+                coors[1] = [nor, nor];
+                coors[3] = [neg, neg];
+                break;
+            case 3 :
+                coors[0] = [neg, neg];
+                coors[1] = [neg, nor];
+                coors[3] = [nor, neg];
+                break;
+            case 4 :
+                coors[0] = [nor, neg];
+                coors[1] = [neg, neg];
+                coors[3] = [nor, nor];
+                break;
+        }
+
+        return test
+             ? this.blocks[3].canMoveTo(coors[3][0], coors[3][1])
+             : this.blocks[0].moveTo(coors[0][0], coors[0][1])
+            && this.blocks[1].moveTo(coors[1][0], coors[1][1])
+            && this.blocks[3].moveTo(coors[3][0], coors[3][1]);
+    }
+
     // state :: @NetrisShapeTElement, Number -> undefined
     function state(num) {
         var blockSize = Number(this.board.dataset.blockSize);
@@ -116,7 +153,7 @@
                 break;
 
             case num === 1 && this.state === 4   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[1]];
                 this.rightBlocks = [this.blocks[0], this.blocks[3]];
@@ -124,7 +161,7 @@
                 break;
 
             case num === 2 && this.state === 1   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[1], this.blocks[2], this.blocks[3]];
                 this.rightBlocks = [this.blocks[0], this.blocks[1], this.blocks[3]];
@@ -132,7 +169,7 @@
                 break;
 
             case num === 3 && this.state === 2   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[3]];
                 this.rightBlocks = [this.blocks[0], this.blocks[1]];
@@ -140,7 +177,7 @@
                 break;
 
             case num === 4 && this.state === 3   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[1], this.blocks[3]];
                 this.rightBlocks = [this.blocks[1], this.blocks[2], this.blocks[3]];
@@ -225,7 +262,7 @@
                 this.downBlocks  = [this.blocks[3]];
                 break;
 
-            default : stateError.call(this);
+            default : this.stateError(num);
         }
 
         if (num > 4) {
@@ -234,53 +271,5 @@
         }
 
         this.state = num;
-
-        // rotateEl :: @NetrisShapeTElement, undefined -> undefined
-        function rotateEl() {
-            rotate.call(this, true) && rotate.call(this, false) || stateError.call(this);
-
-            // rotate :: @NetrisShapeTElement, Boolean -> Boolean
-            function rotate(test) {
-                var coors = { 0 : [], 1 : [], 3 : [] },
-                    nor   = blockSize,
-                    neg   = -blockSize;
-
-                switch (this.state) {
-                    case 1 :
-                        coors[0] = [nor, nor];
-                        coors[1] = [nor, neg];
-                        coors[3] = [neg, nor];
-                        break;
-                    case 2 :
-                        coors[0] = [neg, nor];
-                        coors[1] = [nor, nor];
-                        coors[3] = [neg, neg];
-                        break;
-                    case 3 :
-                        coors[0] = [neg, neg];
-                        coors[1] = [neg, nor];
-                        coors[3] = [nor, neg];
-                        break;
-                    case 4 :
-                        coors[0] = [nor, neg];
-                        coors[1] = [neg, neg];
-                        coors[3] = [nor, nor];
-                        break;
-                }
-
-                return test
-                     ? this.blocks[3].canMoveTo(coors[3][0], coors[3][1])
-                     : this.blocks[0].moveTo(coors[0][0], coors[0][1])
-                    && this.blocks[1].moveTo(coors[1][0], coors[1][1])
-                    && this.blocks[3].moveTo(coors[3][0], coors[3][1]);
-            }
-        }
-
-        // stateError :: @NetrisShapeTElement, undefined -> undefined
-        function stateError() {
-            throw Object.assign(new Error('Invalid state transition ', this.state, '->', num), {
-                name : 'InvalidStateTransition'
-            });
-        }
     }
 }());

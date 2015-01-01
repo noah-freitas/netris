@@ -10,6 +10,8 @@
         fall             : fall,
         move             : move,
         rotate           : rotate,
+        rotateEl         : rotateEl,
+        stateError       : stateError,
         stopFalling      : stopFalling
     });
 
@@ -72,6 +74,18 @@
 
     // rotate :: @NetrisShapeElement, undefined -> undefined
     function rotate() {}
+
+    // rotateEl :: @NetrisShapeElement, Number -> undefined
+    function rotateEl(newState) {
+        this.rotateOrTest(true) && this.rotateOrTest(false) || this.stateError(newState);
+    }
+
+    // stateError :: @NetrisShapeElement, Number -> undefined
+    function stateError(newState) {
+        throw Object.assign(new Error('Invalid state transition ', this.state, '->', newState), {
+            name : 'InvalidStateTransition'
+        });
+    }
 
     // stopFalling :: @NetrisShapeElement, undefined -> undefined
     function stopFalling() {

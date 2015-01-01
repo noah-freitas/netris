@@ -4,7 +4,8 @@
     var proto = Object.assign(Object.create(NetrisShapeElement.prototype), {
         blockRemoved : blockRemoved,
         makeBlocks   : makeBlocks,
-        rotate       : rotate
+        rotate       : rotate,
+        rotateOrTest : rotateOrTest
     });
 
     window.NetrisShapeZRightElement = document.registerElement('netris-shape-z-right', { prototype : proto });
@@ -71,6 +72,15 @@
         }
     }
 
+    // rotateOrTest :: @NetrisShapeZRightElement, Boolean -> Boolean
+    function rotateOrTest(test) {
+        var nor = Number(this.board.dataset.blockSize),
+            neg = -nor;
+
+        return this.blocks[2][test ? 'canMoveTo' : 'moveTo'](this.state === 1 ? nor : neg, (this.state === 1 ? neg : nor) * 2, true)
+            && this.blocks[3][test ? 'canMoveTo' : 'moveTo'](this.state === 1 ? nor : neg, 0                                 , true);
+    }
+
     // state :: @NetrisShapeZRightElement, Number -> undefined
     function state(num) {
         var blockSize = Number(this.board.dataset.blockSize);
@@ -90,7 +100,7 @@
                 break;
 
             case num === 1 && this.state === 2   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[2]];
                 this.rightBlocks = [this.blocks[1], this.blocks[3]];
@@ -98,7 +108,7 @@
                 break;
 
             case num === 2 && this.state === 1   :
-                rotateEl.call(this);
+                this.rotateEl(num);
 
                 this.leftBlocks  = [this.blocks[0], this.blocks[2], this.blocks[3]];
                 this.rightBlocks = [this.blocks[1], this.blocks[2], this.blocks[3]];
@@ -141,7 +151,7 @@
                 this.downBlocks  = [this.blocks[2]];
                 break;
 
-            default : stateError.call(this);
+            default : this.stateError(num);
         }
 
         if (num > 2) {
@@ -150,26 +160,5 @@
         }
 
         this.state = num;
-
-        // rotateEl :: @NetrisShapeZRightElement, undefined -> undefined
-        function rotateEl() {
-            rotate.call(this, true) && rotate.call(this, false) || stateError.call(this);
-
-            // rotate :: @NetrisShapeZRightElement, Boolean -> Boolean
-            function rotate(test) {
-                var nor = blockSize,
-                    neg = -blockSize;
-
-                return this.blocks[2][test ? 'canMoveTo' : 'moveTo'](this.state === 1 ? nor : neg, (this.state === 1 ? neg : nor) * 2, true)
-                    && this.blocks[3][test ? 'canMoveTo' : 'moveTo'](this.state === 1 ? nor : neg, 0                                 , true);
-            }
-        }
-
-        // stateError :: @NetrisShapeZRightElement, undefined -> undefined
-        function stateError() {
-            throw Object.assign(new Error('Invalid state transition ', this.state, '->', num), {
-                name : 'InvalidStateTransition'
-            });
-        }
     }
 }());
