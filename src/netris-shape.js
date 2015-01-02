@@ -1,3 +1,23 @@
+/**
+ * NetrisShapeElement <netris-shape>
+ *
+ * A shape is a group of blocks in a geographic arrangement.
+ * A shape is always in a known arrangement, and it can change
+ * arrangements by moving or removing its blocks.  The possible
+ * arrangements that a shape can take on are represented as its
+ * states.
+ *
+ * A shape has one or more states which can be thought of as a
+ * directed graph.  A terminal state is one without any out edges.
+ *
+ * A player can change the state of a shape by rotating it, if
+ * the shape allows rotation.  The board will also change the
+ * state of a shape by removing its blocks as rows are cleared.
+ *
+ * Once all of the shape's blocks have been removed (which can
+ * only happen while in a terminal state), the shape will remove
+ * itself from the board.
+ */
 ;(function () {
     'use strict';
 

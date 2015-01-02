@@ -1,3 +1,13 @@
+/**
+ * NetrisControllerElement <netris-controller>
+ *
+ * A netris controller captures the commands issued by
+ * a player and converts them to netris-controller:move:*
+ * custom events fired on the document.
+ *
+ * Active shapes listen for these events and attempt to
+ * execute the command if the command came from their player.
+ */
 ;(function () {
     'use strict';
 

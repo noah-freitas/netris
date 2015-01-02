@@ -1,3 +1,13 @@
+/**
+ * NetrisBoardElement <netris-board>
+ *
+ * A board has one or more shapes.  It manages the game
+ * event loop, falling each active shape one per turn.
+ * When a shape stops falling and becomes inactive, it
+ * will end the game if it stopped out of bounds, or it
+ * will clear complete rows and add a new random shape
+ * if the shape stopped in bounds.
+ */
 ;(function () {
     'use strict';
 
