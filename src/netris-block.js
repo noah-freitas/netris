@@ -25,9 +25,11 @@
 
     // attachedCallback :: @NetrisBlockElement, undefined -> undefined
     function attachedCallback() {
-        this.board      = this.parentElement.parentElement;
-        this.style.left = (this.dataset.posLeft || 0) + 'px';
-        this.style.top  = (this.dataset.posTop  || 0) + 'px';
+        this.board        = this.parentElement.parentElement;
+        this.style.height = this.board.dataset.blockSize + 'px';
+        this.style.left   = (this.dataset.posLeft || 0)  + 'px';
+        this.style.top    = (this.dataset.posTop  || 0)  + 'px';
+        this.style.width  = this.board.dataset.blockSize + 'px';
     }
 
     // canMove :: @NetrisBlockElement, String, Number -> Boolean
