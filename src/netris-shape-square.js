@@ -1,3 +1,23 @@
+/**
+ * NetrisShapeSquareElement <netris-shape-square>
+ *
+ * A square is four blocks arranged as a square.  It
+ * does not allow rotation.
+ *
+ * States (3):
+ *
+ * 1 -> 2, 3
+ *  0 1
+ *  2 3
+ *
+ * 2
+ *  0 1
+ *  - -
+ *
+ * 3
+ *  - -
+ *  2 3
+ */
 ;(function () {
     'use strict';
 
