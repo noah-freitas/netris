@@ -1,3 +1,12 @@
+/**
+ * NetrisBlockElement <netris-block>
+ *
+ * A block is a square shape.  It has a definite location
+ * on the board.  It exposes methods to change that location
+ * and to test whether a certain change is valid.  A movement
+ * is valid if the new space that a block will occupy is
+ * currently occupied by the board and not another block.
+ */
 ;(function () {
     'use strict';
 
