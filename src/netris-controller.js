@@ -21,6 +21,7 @@
 
     // attachedCallback :: @NetrisControllerElement, undefined -> undefined
     function attachedCallback() {
+        this.player = this.parentElement;
         document.addEventListener('keydown', this.keyHandler);
     }
 
@@ -44,7 +45,7 @@
         var key = e.keyIdentifier.toLowerCase(),
             dir = this.keys[key];
 
-        if (dir) document.dispatchEvent(new CustomEvent('netris-controller:move:' + this.dataset.player, {
+        if (dir) document.dispatchEvent(new CustomEvent('netris-controller:move:' + this.player.dataset.name, {
             detail  : dir
         }));
     }

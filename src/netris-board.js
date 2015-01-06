@@ -11,14 +11,6 @@
 ;(function () {
     'use strict';
 
-    var shapes = [
-        'netris-shape-line',
-        'netris-shape-square',
-        'netris-shape-t',
-        'netris-shape-z-left',
-        'netris-shape-z-right'
-    ];
-
     var proto = Object.assign(Object.create(HTMLElement.prototype), {
         addShape         : addShape,
         adjustRows       : adjustRows,
@@ -37,6 +29,19 @@
     function attachedCallback() {
         this.addEventListener('netris-shape:stopped'     , this.shapeStopped);
         this.addEventListener('netris-shape:outofbounds' , this.endGame);
+
+        this.style.height = this.dataset.boardHeight + 'px';
+        this.style.width  = this.dataset.boardWidth  + 'px';
+
+        // Add starting shapes for each player.
+        Array.from(this.querySelectorAll('netris-player')).forEach(function (p) {
+            var playerShape              = document.createElement('netris-shape');
+            playerShape.dataset.player   = p.dataset.name;
+            playerShape.dataset.posLeft  = p.dataset.startX;
+            playerShape.dataset.fallRate = p.dataset.speed;
+            this.addShape(playerShape);
+        }, this);
+
         requestAnimationFrame(this.fallShapes);
     }
 
@@ -50,17 +55,18 @@
         this.appendChild(newBlock);
     }
 
-    // adjustRows :: @NetrisBoardElement, undefined -> undefined
-    function adjustRows() {
-        while (this.clearRows()) while (this.dropShapes()) undefined;
+    // adjustRows :: @NetrisBoardElement, NetrisShapeElement -> undefined
+    function adjustRows(cause) {
+        while (this.clearRows(cause)) while (this.dropShapes()) undefined;
     }
 
-    // clearRows :: @NetrisBoardElement, undefined -> undefined
-    function clearRows() {
+    // clearRows :: @NetrisBoardElement, NetrisShapeElement -> undefined
+    function clearRows(cause) {
         var cleared = false;
 
         this.getRows().reverse().forEach(function (row) {
             if (row.every(isntNull)) {
+                this.dispatchEvent(new CustomEvent('netris-board:rowcleared', { detail : cause }));
                 cleared = true;
                 row.forEach(clearBlock);
             }
@@ -76,12 +82,19 @@
     function createdCallback() {
         this.endGame         = endGame.bind(this);
         this.fallShapes      = fallShapes.bind(this);
-        this.fallingShapeSel = shapes.map(function (s) { return s + '[data-falling="true"]'; }).join(', ');
         this.gameOver        = false;
         this.makeRows        = makeRows.bind(this);
         this.shapeStopped    = shapeStopped.bind(this);
-        this.stoppedBlockSel = shapes.map(function (s) { return s + '[data-falling="false"] netris-block'; }).join(', ');
-        this.stoppedShapeSel = shapes.map(function (s) { return s + '[data-falling="false"]'; }).join(', ');
+
+        this.shapes          = this.dataset.shapes.split(' ');
+        this.fallingShapeSel = this.shapes.map(append('[data-falling="true"]')).join(', ');
+        this.stoppedBlockSel = this.shapes.map(append('[data-falling="false"] netris-block')).join(', ');
+        this.stoppedShapeSel = this.shapes.map(append('[data-falling="false"]')).join(', ');
+
+        // append :: String -> (String -> String)
+        function append(a) {
+            return function (s) { return s + a; };
+        }
     }
 
     // dropShapes :: @NetrisBoardElement, undefined -> Boolean
@@ -142,12 +155,12 @@
 
     // randomShape :: undefined -> String
     function randomShape() {
-        return shapes[Math.round(Math.random() * (shapes.length - 1))];
+        return this.shapes[Math.round(Math.random() * (this.shapes.length - 1))];
     }
 
     // shapeStopped :: @NetrisBoardElement, Event -> undefined
     function shapeStopped(e) {
-        this.adjustRows();
+        this.adjustRows(e.target);
         this.addShape(e.target);
     }
 
