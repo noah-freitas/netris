@@ -35,6 +35,7 @@
     // fireScore :: @NetrisPlayerElement, undefined -> undefined
     function fireScore() {
         document.dispatchEvent(new CustomEvent('netris-player:score', { detail : {
+            color  : this.dataset.color,
             player : this.dataset.name,
             score  : this.score
         } }));

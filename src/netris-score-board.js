@@ -26,20 +26,22 @@
         this.appendChild(document.createElement('ul'));
     }
 
-    // makeEl :: @NetrisScoreBoardElement, { player :: String, score :: Number } -> undefined
+    // makeEl :: @NetrisScoreBoardElement, { color :: String, player :: String, score :: Number } -> undefined
     function makeEl(detail) {
-        var playerEl       = document.createElement('li'),
-            nameEl         = document.createElement('span'),
-            scoreEl        = document.createElement('span');
-        nameEl.textContent = detail.player;
+        var playerEl                = document.createElement('li'),
+            nameEl                  = document.createElement('span'),
+            scoreEl                 = document.createElement('span');
 
+        nameEl.textContent          = detail.player;
+        playerEl.style.color        = detail.color;
         this.players[detail.player] = scoreEl;
+
         playerEl.appendChild(nameEl);
         playerEl.appendChild(scoreEl);
         this.querySelector('ul').appendChild(playerEl);
     }
 
-    // setScore :: @NetrisScoreBoardElement, { player :: String, score :: Number } -> undefined
+    // setScore :: @NetrisScoreBoardElement, { color :: String, player :: String, score :: Number } -> undefined
     function setScore(detail) {
         this.players[detail.player].textContent = detail.score;
     }
