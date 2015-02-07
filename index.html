@@ -10,9 +10,9 @@
                 padding : 0;
             }
             netris-board {
-                background : rgba(255, 0, 0, 0.3);
+                background : rgba(0, 0, 0, 0.3);
                 display    : block;
-                outline    : 1px solid red;
+                outline    : 1px solid rgba(0, 0, 0, 0.5);
                 position   : relative;
                 z-index    : 1;
             }
@@ -49,31 +49,39 @@
         <netris-score-board></netris-score-board>
         <netris-board
             data-block-size="20"
-            data-board-width="400"
-            data-board-height="400"
+            data-board-width="1200"
+            data-board-height="600"
             data-shapes="netris-shape-line netris-shape-square netris-shape-t netris-shape-z-left netris-shape-z-right"
         >
-            <netris-player data-name="Noah" data-color="red" data-start-x="200" data-speed="1">
-                <netris-controller
-                    data-left-key="left"
-                    data-down-key="down"
-                    data-right-key="right"
-                    data-rotate-key="up"
-                ></netris-controller>
+            <netris-player data-name="Noah" data-color="red" data-start-x="400" data-speed="1">
+                <netris-gamepad-controller
+                    data-index="0"
+                    data-sample-rate="35"
+                ></netris-gamepad-controller>
             </netris-player>
             <netris-player data-name="Imelda" data-color="blue" data-start-x="100" data-speed="1">
-                <netris-controller
-                    data-left-key="u+0041"
-                    data-down-key="u+0053"
-                    data-right-key="u+0044"
-                    data-rotate-key="u+0057"
-                ></netris-controller>
+                <netris-gamepad-controller
+                    data-index="1"
+                    data-sample-rate="35"
+                ></netris-gamepad-controller>
+            </netris-player>
+            <netris-player data-name="Mando" data-color="orange" data-start-x="800" data-speed="1">
+                <netris-gamepad-controller
+                    data-index="2"
+                    data-sample-rate="35"
+                ></netris-gamepad-controller>
+            </netris-player>
+            <netris-player data-name="Toya" data-color="green" data-start-x="1100" data-speed="1">
+                <netris-gamepad-controller
+                    data-index="3"
+                    data-sample-rate="35"
+                ></netris-gamepad-controller>
             </netris-player>
         </netris-board>
         <script src="src/netris-score-board.js"></script>
         <script src="src/netris-block.js"></script>
         <script src="src/netris-board.js"></script>
-        <script src="src/netris-controller.js"></script>
+        <script src="src/netris-gamepad-controller.js"></script>
         <script src="src/netris-player.js"></script>
         <script src="src/netris-shape.js"></script>
         <script src="src/netris-shape-line.js"></script>
