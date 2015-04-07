@@ -32,9 +32,10 @@
                 width    : 0;
             }
             netris-score-board {
-                display : block;
-                float   : right;
-                width   : 200px;
+                display      : block;
+                float        : right;
+                margin-right : 20px;
+                width        : 200px;
             }
             netris-score-board li {
                 list-style-type : none;
@@ -49,32 +50,36 @@
         <netris-score-board></netris-score-board>
         <netris-board
             data-block-size="20"
-            data-board-width="1200"
-            data-board-height="600"
+            data-board-width="1300"
+            data-board-height="980"
             data-shapes="netris-shape-line netris-shape-square netris-shape-t netris-shape-z-left netris-shape-z-right"
         >
             <netris-player data-name="Noah" data-color="red" data-start-x="400" data-speed="1">
                 <netris-gamepad-controller
                     data-index="0"
                     data-sample-rate="35"
+                    data-axes-offset="0"
                 ></netris-gamepad-controller>
             </netris-player>
             <netris-player data-name="Imelda" data-color="blue" data-start-x="100" data-speed="1">
                 <netris-gamepad-controller
                     data-index="1"
                     data-sample-rate="35"
+                    data-axes-offset="0"
                 ></netris-gamepad-controller>
             </netris-player>
             <netris-player data-name="Mando" data-color="orange" data-start-x="800" data-speed="1">
                 <netris-gamepad-controller
                     data-index="2"
                     data-sample-rate="35"
+                    data-axes-offset="3"
                 ></netris-gamepad-controller>
             </netris-player>
             <netris-player data-name="Toya" data-color="green" data-start-x="1100" data-speed="1">
                 <netris-gamepad-controller
                     data-index="3"
                     data-sample-rate="35"
+                    data-axes-offset="3"
                 ></netris-gamepad-controller>
             </netris-player>
         </netris-board>

@@ -144,7 +144,7 @@
     // makeRows :: @NetrisBoardElement, [[NetrisBlockElement || null]], NetrisBlockElement -> [[NetrisBlockElement || null]]
     function makeRows(rows, block) {
         var size = Number(this.dataset.blockSize);
-        rows[block.offsetTop / size][block.offsetLeft / size] = block;
+        rows[Math.floor(block.offsetTop / size)][Math.floor(block.offsetLeft / size)] = block;
         return rows;
     }
 

@@ -37,10 +37,10 @@
         this.attached = false;
     }
 
-    // getCommand :: Number -> String
-    function getCommand(i) {
+    // getCommand :: Number, Number -> String
+    function getCommand(i, axesOffset) {
         var gp   = navigator.getGamepads()[i],
-            axes = gp && gp.axes.slice(0, 2).map(Math.round);
+            axes = gp && gp.axes.slice(axesOffset, axesOffset + 2).map(Math.round);
 
         return !gp                        ? ''                 :
                !axes.every(equalZero)     ? getDirection(axes) :
@@ -69,7 +69,7 @@
         if (time - this.lastTime < Number(this.dataset.sampleRate)) return;
 
         var command;
-        if (command = getCommand(Number(this.dataset.index))) document.dispatchEvent(new CustomEvent('netris-controller:move:' + this.player.dataset.name, {
+        if (command = getCommand(Number(this.dataset.index), Number(this.dataset.axesOffset))) document.dispatchEvent(new CustomEvent('netris-controller:move:' + this.player.dataset.name, {
             detail : command
         }));
 

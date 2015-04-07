@@ -118,8 +118,10 @@
 
     // stopFalling :: @NetrisShapeElement, undefined -> undefined
     function stopFalling() {
-        this.dataset.falling = 'false';
-        document.removeEventListener('netris-controller:move:' + this.dataset.player, this.moveHandler);
-        this.dispatchEvent(new CustomEvent('netris-shape:' + (this.offsetTop >= 0 ? 'stopped' : 'outofbounds'), { bubbles : true }));
+        setTimeout(function () {
+            this.dataset.falling = 'false';
+            document.removeEventListener('netris-controller:move:' + this.dataset.player, this.moveHandler);
+            this.dispatchEvent(new CustomEvent('netris-shape:' + (this.offsetTop >= 0 ? 'stopped' : 'outofbounds'), { bubbles : true }));
+        }.bind(this), 0);
     }
 }());
