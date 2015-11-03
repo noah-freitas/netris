@@ -1,1 +1,4 @@
 # Build stuff
+coverage/
+node_modules/
+

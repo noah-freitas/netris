@@ -1,0 +1,32 @@
+{
+  "name": "netris",
+  "version": "0.0.0",
+  "description": "Tetris for the web",
+  "main": "index.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noah-freitas/netris.git"
+  },
+  "keywords": [
+    "tetris",
+    "netris"
+  ],
+  "author": "noah.j.freitas@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/noah-freitas/netris/issues"
+  },
+  "homepage": "https://github.com/noah-freitas/netris#readme",
+  "devDependencies": {
+    "karma": "^0.13.14",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-coverage": "^0.5.3",
+    "karma-jasmine": "^0.3.6"
+  }
+}
