@@ -25,7 +25,7 @@
 
     // attachedCallback :: @NetrisBlockElement, undefined -> undefined
     function attachedCallback() {
-        this.board        = this.parentElement.parentElement;
+        this.board        = this.dataset.boardEl ? this.closest(this.dataset.boardEl) : this.parentElement.parentElement;
         this.style.height = this.board.dataset.blockSize + 'px';
         this.style.left   = (this.dataset.posLeft || 0)  + 'px';
         this.style.top    = (this.dataset.posTop  || 0)  + 'px';
