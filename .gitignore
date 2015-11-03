@@ -1,4 +1,5 @@
 # Build stuff
+bower_components/
 coverage/
 node_modules/
 
