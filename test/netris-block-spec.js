@@ -32,7 +32,7 @@ describe('netris-block', () => {
         });
     });
 
-    describe('when attached', () => {
+    describe('when attached with a data-board-el', () => {
         let board;
         const BOARD_BLOCK_SIZE = '25';
 
@@ -50,6 +50,72 @@ describe('netris-block', () => {
             board.dataset.blockSize = BOARD_BLOCK_SIZE;
             el.dataset.boardEl      = 'netris-board-stub';
             document.body.appendChild(board);
+        }
+    });
+
+    describe('canMove', () => {
+        const BOARD_BLOCK_SIZE = 25,
+              STUB_STYLE_ID    = 'netris-block-spec-css';
+
+        let board;
+
+        beforeEach(addCss);
+        beforeEach(attachEl(createStubBoardAndAttach, () => board));
+        afterEach(removeCss);
+        afterEach(detachEl(() => board.remove()));
+
+        describe('when in its default position', () => {
+            it(
+                `should return true if the coordinates under the specified direction are empty.
+                 The coordinates are empty if the corners of specified direction are occupied
+                 by the block itself or its data-block-el.  The moved to position is computed
+                 using the height of the block.`,
+                () => {
+                    expect(el.canMove('down' )).toBe(true);
+                    expect(el.canMove('left' )).toBe(false);
+                    expect(el.canMove('right')).toBe(true);
+                }
+            );
+        });
+
+        describe('when set to a new position', () => {
+
+        });
+
+        // addCss :: undefined -> undefined
+        function addCss() {
+            let style         = document.createElement('style');
+            style.id          = STUB_STYLE_ID;
+            style.textContent = `
+                netris-board-stub {
+                    display  : block;
+                    position : relative;
+                }
+                netris-block {
+                    display  : block;
+                    left     : 0;
+                    position : absolute;
+                    top      : 0;
+                }
+            `;
+            document.body.appendChild(style);
+        }
+
+        // createStubBoardAndAttach :: undefined -> undefined
+        function createStubBoardAndAttach() {
+            let boardSideDim        = `${ BOARD_BLOCK_SIZE * 10 }px`
+            board                   = document.createElement('netris-board-stub');
+            board.dataset.blockSize = BOARD_BLOCK_SIZE;
+            board.style.height      = boardSideDim;
+            board.style.width       = boardSideDim;
+            el.dataset.boardEl      = 'netris-board-stub';
+            board.appendChild(el);
+            document.body.appendChild(board);
+        }
+
+        // removeCss :: undefined -> undefined
+        function removeCss() {
+            document.querySelector(`#${ STUB_STYLE_ID }`).remove();
         }
     });
 
